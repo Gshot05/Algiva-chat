@@ -7,8 +7,8 @@ info:
 tags:
   - name: Chat
     description: Основные методы для пользователей (создание чата, отправка сообщений, история)
-  - name: Admin
-    description: Инструменты для операторов и администраторов (модерация, просмотр всех чатов, удаление)
+  - name: Operator
+    description: Инструменты для операторов (модерация, просмотр всех чатов, удаление)
   - name: System
     description: Системные и вспомогательные методы (типы пользователей, метаданные)
 
@@ -210,11 +210,11 @@ paths:
                     example: "success"
 
 
-  /Admin/Get_Chats:
+  /Operator_Get_Chats:
     get:
       tags:
-        - Admin
-      summary: Получение списка всех чатов для администратора
+        - Operator
+      summary: Получение списка всех чатов для оператора
       description: >
         Возвращает список чатов с поддержкой фильтрации по сервису, 
         наличию жалоб и текстовому поиску. 
@@ -295,10 +295,10 @@ paths:
                           type: string
                           description: "JSON строка с полной метадатой"
 
-  /Delete_Message:
+  /Operator_Delete_Message:
     post:
       tags:
-        - Admin
+        - Operator
       summary: Удалить сообщение (Soft Delete)
       description: >
         Помечает сообщение как удаленное. 
