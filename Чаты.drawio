@@ -1,0 +1,151 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Страница-1" id="6vhmA59K8Xdd6y5LlQgf">
+    <mxGraphModel dx="1230" dy="1845" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="UqqT4urgchzkFPyOfZkk-3" edge="1" parent="1" source="UqqT4urgchzkFPyOfZkk-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="UqqT4urgchzkFPyOfZkk-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-4" connectable="0" parent="UqqT4urgchzkFPyOfZkk-3" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];rotation=0;" value="Передаем:&lt;br&gt;&lt;br&gt;&lt;div&gt;Chat_Name&lt;/div&gt;&lt;div&gt;Service(Ads, Support)&lt;/div&gt;&lt;div&gt;Metadata(Ad uid, uid seller, uid buyer)&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.066" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Пользователь&amp;nbsp;&lt;div&gt;нажал&lt;/div&gt;&lt;div&gt;&quot;Написать продавцу&quot;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="170" x="30" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-6" edge="1" parent="1" source="UqqT4urgchzkFPyOfZkk-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="UqqT4urgchzkFPyOfZkk-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Ручка Create_chat&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Добавляем участников в чат:&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Chat_ID&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;User_UID&lt;/div&gt;&lt;div&gt;User_Type&lt;/div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="140" width="126" x="55" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-11" edge="1" parent="1" source="UqqT4urgchzkFPyOfZkk-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="UqqT4urgchzkFPyOfZkk-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="&lt;div&gt;В ответе пришёл chat_id&lt;/div&gt;" vertex="1">
+          <mxGeometry height="60" width="120" x="58" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-9" edge="1" parent="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="UqqT4urgchzkFPyOfZkk-8" value="">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="430" y="71" as="sourcePoint" />
+            <mxPoint x="430" y="221" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-10" connectable="0" parent="UqqT4urgchzkFPyOfZkk-9" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Передаем:&lt;div&gt;&lt;br&gt;&lt;div&gt;&lt;div&gt;Chat_ID&lt;/div&gt;&lt;div&gt;User_UID(UID того кто пишет сообщение&lt;/div&gt;&lt;div&gt;будем брать из запроса)&lt;/div&gt;&lt;div&gt;Content&lt;/div&gt;&lt;div&gt;Attachments&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="0.1711" y="4" as="geometry">
+            <mxPoint x="-4" y="-12" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-7" parent="1" style="whiteSpace=wrap;html=1;" value="Отправка сообщений" vertex="1">
+          <mxGeometry height="60" width="120" x="370" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-13" edge="1" parent="1" source="UqqT4urgchzkFPyOfZkk-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="UqqT4urgchzkFPyOfZkk-12" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-8" parent="1" style="whiteSpace=wrap;html=1;" value="Ручка&amp;nbsp;&amp;nbsp;Send_message&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Перед отправкой сообщений проверки:&lt;br&gt;&lt;br&gt;Находится ли данный юзер в чате&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Проверить, что чат активный&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Проверка, что товар не в резерве, и&amp;nbsp; если в резерве, что отправитель это продаван&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Антиконтакт&lt;/div&gt;" vertex="1">
+          <mxGeometry height="290" width="140" x="360" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-12" parent="1" style="whiteSpace=wrap;html=1;" value="Ответ &quot;200&quot; если всё прошло гуд" vertex="1">
+          <mxGeometry height="60" width="120" x="370" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-18" edge="1" parent="1" source="UqqT4urgchzkFPyOfZkk-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="UqqT4urgchzkFPyOfZkk-17" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-19" connectable="0" parent="UqqT4urgchzkFPyOfZkk-18" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Передаем:&lt;br&gt;&lt;br&gt;&lt;div&gt;User_UID&lt;/div&gt;&lt;div&gt;Service(Ads, Support)&lt;/div&gt;&lt;div&gt;Active&lt;/div&gt;&lt;div&gt;Limit&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="0.0364" y="-3" as="geometry">
+            <mxPoint x="3" y="-14" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-16" parent="1" style="whiteSpace=wrap;html=1;" value="Получить все чаты пользака" vertex="1">
+          <mxGeometry height="60" width="120" x="950" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-21" edge="1" parent="1" source="UqqT4urgchzkFPyOfZkk-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="UqqT4urgchzkFPyOfZkk-20" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-17" parent="1" style="whiteSpace=wrap;html=1;" value="Ручка&amp;nbsp;Get_Chats" vertex="1">
+          <mxGeometry height="60" width="120" x="950" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-23" edge="1" parent="1" source="UqqT4urgchzkFPyOfZkk-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="UqqT4urgchzkFPyOfZkk-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-20" parent="1" style="whiteSpace=wrap;html=1;" value="Ручка отдаёт все чаты конкретного юзера" vertex="1">
+          <mxGeometry height="60" width="120" x="950" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-25" edge="1" parent="1" source="UqqT4urgchzkFPyOfZkk-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="UqqT4urgchzkFPyOfZkk-24" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-26" connectable="0" parent="UqqT4urgchzkFPyOfZkk-25" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&lt;div&gt;Передаем:&lt;/div&gt;&lt;div&gt;&lt;br&gt;Chat_ID&lt;/div&gt;&lt;div&gt;Last_loaded_message_id (opt)&lt;/div&gt;&lt;div&gt;Limit (opt)&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="0.1733" y="-2" as="geometry">
+            <mxPoint x="2" y="-14" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-22" parent="1" style="whiteSpace=wrap;html=1;" value="Получить все сообщения по чату" vertex="1">
+          <mxGeometry height="60" width="120" x="1180" y="50" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-28" edge="1" parent="1" source="UqqT4urgchzkFPyOfZkk-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="UqqT4urgchzkFPyOfZkk-27" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-24" parent="1" style="whiteSpace=wrap;html=1;" value="Ручка&amp;nbsp;Get_Messages&lt;div&gt;Проверка что пользак входит в чат&lt;/div&gt;" vertex="1">
+          <mxGeometry height="70" width="140" x="1171" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="UqqT4urgchzkFPyOfZkk-27" parent="1" style="whiteSpace=wrap;html=1;" value="Возвращает все сообщения по чату пользака" vertex="1">
+          <mxGeometry height="60" width="120" x="1180" y="425" as="geometry" />
+        </mxCell>
+        <mxCell id="mkVnqhSt01BGLeg9LLo3-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;font style=&quot;font-size: 36px;&quot;&gt;Чат пользака&lt;/font&gt;" vertex="1">
+          <mxGeometry height="200" width="420" x="520" y="-220" as="geometry" />
+        </mxCell>
+        <mxCell id="mkVnqhSt01BGLeg9LLo3-12" edge="1" parent="1" source="mkVnqhSt01BGLeg9LLo3-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" target="UqqT4urgchzkFPyOfZkk-12">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="745" y="650" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mkVnqhSt01BGLeg9LLo3-13" connectable="0" parent="mkVnqhSt01BGLeg9LLo3-12" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Если жалоба успешно отправилась" vertex="1">
+          <mxGeometry relative="1" x="-0.0159" y="2" as="geometry">
+            <mxPoint x="-10" y="-2" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mkVnqhSt01BGLeg9LLo3-8" parent="1" style="whiteSpace=wrap;html=1;" value="Ручка Report_Complaint&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Если какая-то из сторон захочет пожаловаться&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="150" x="670" y="510" as="geometry" />
+        </mxCell>
+        <mxCell id="mkVnqhSt01BGLeg9LLo3-10" edge="1" parent="1" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="mkVnqhSt01BGLeg9LLo3-8" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="430" y="550" as="sourcePoint" />
+            <mxPoint x="650" y="410" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mkVnqhSt01BGLeg9LLo3-11" connectable="0" parent="mkVnqhSt01BGLeg9LLo3-10" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Передаём в ручке&lt;div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;Chat_ID&lt;/div&gt;&lt;div&gt;Reason&lt;/div&gt;&lt;div&gt;Message_text&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.1583" y="1" as="geometry">
+            <mxPoint x="39" y="1" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="q-3P5QV8bBHnyzh9fXRt-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;" value="&lt;span style=&quot;font-size: 36px;&quot;&gt;Админка&lt;/span&gt;" vertex="1">
+          <mxGeometry height="200" width="420" x="2180" y="-230" as="geometry" />
+        </mxCell>
+        <mxCell id="q-3P5QV8bBHnyzh9fXRt-6" edge="1" parent="1" source="q-3P5QV8bBHnyzh9fXRt-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="q-3P5QV8bBHnyzh9fXRt-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="q-3P5QV8bBHnyzh9fXRt-7" connectable="0" parent="q-3P5QV8bBHnyzh9fXRt-6" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Принимает&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;Chat_ID&lt;/div&gt;&lt;div&gt;Sender_id&lt;/div&gt;&lt;div&gt;Message_id&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="0.0502" y="3" as="geometry">
+            <mxPoint x="-3" y="-8" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="q-3P5QV8bBHnyzh9fXRt-2" parent="1" style="whiteSpace=wrap;html=1;" value="Админ хочет удалить сообщение(soft delete)" vertex="1">
+          <mxGeometry height="70" width="170" x="2100" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="q-3P5QV8bBHnyzh9fXRt-9" edge="1" parent="1" source="q-3P5QV8bBHnyzh9fXRt-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="q-3P5QV8bBHnyzh9fXRt-8" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="q-3P5QV8bBHnyzh9fXRt-3" parent="1" style="whiteSpace=wrap;html=1;" value="Ручка&amp;nbsp;Delete_message" vertex="1">
+          <mxGeometry height="70" width="170" x="2100" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="q-3P5QV8bBHnyzh9fXRt-8" parent="1" style="whiteSpace=wrap;html=1;" value="&quot;200&quot;" vertex="1">
+          <mxGeometry height="60" width="120" x="2125" y="395" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

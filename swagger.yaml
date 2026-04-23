@@ -1,0 +1,373 @@
+openapi: 3.0.0
+info:
+  title: Чат (Покупашка - Продавашка)
+  version: 1.0.0
+  description: API для чатов между покупателями и продавцами, а также инструменты модерации.
+
+tags:
+  - name: Chat
+    description: Основные методы для пользователей (создание чата, отправка сообщений, история)
+  - name: Admin
+    description: Инструменты для операторов и администраторов (модерация, просмотр всех чатов, удаление)
+  - name: System
+    description: Системные и вспомогательные методы (типы пользователей, метаданные)
+
+paths:
+
+  /Create_chat:
+    post:
+      tags:
+        - Chat
+      summary: Создать чат из объявления
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - lot_id
+              properties:
+                lot_id:
+                  type: string
+                  description: ID лота, по которому создается чат
+      responses:
+        "200":
+          description: Чат успешно создан
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chat_id:
+                    type: string
+
+  /Send_message:
+    post:
+      tags:
+        - Chat
+      summary: Отправить сообщение в чат
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - chat_id
+                - content
+              properties:
+                chat_id:
+                  type: string
+                content:
+                  type: string
+                attachments:
+                  type: array
+                  items:
+                    type: string
+                  description: Список путей к вложениям (опционально)
+      responses:
+        "200":
+          description: Сообщение успешно отправлено
+
+  /Get_Chats:
+    get:
+      tags:
+        - Chat
+      summary: Получить список чатов пользователя
+      parameters:
+        - in: query
+          name: user_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: service
+          schema:
+            type: string
+            enum: [ads, support]
+            description: Фильтр по типу сервиса
+        - in: query
+          name: active
+          schema:
+            type: boolean
+            description: Только активные чаты
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Список чатов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chats:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        chat_id:
+                          type: string
+                        chat_name:
+                          type: string
+                        last_message:
+                          type: string
+                        unread_count:
+                          type: integer
+                        metadata:
+                          type: object
+                        is_readonly:
+                          type: boolean
+
+  /Get_Messages:
+    get:
+      tags:
+        - Chat
+      summary: Получить историю сообщений чата
+      parameters:
+        - in: query
+          name: chat_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: last_loaded_message_id
+          schema:
+            type: integer
+            description: ID последнего загруженного сообщения для пагинации
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+      responses:
+        "200":
+          description: Список сообщений
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        message_id:
+                          type: integer
+                        sender_id:
+                          type: string
+                        content:
+                          type: string
+                        attachments:
+                          type: array
+                          items:
+                            type: string
+                        created_at:
+                          type: string
+                          format: date-time
+                        is_read:
+                          type: boolean
+
+  /Report_Complaint:
+    post:
+      tags:
+        - Chat
+      summary: Пожаловаться на сообщение или чат
+      description: Пользователь отправляет жалобу. Информация сохраняется в метадату чата.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - chat_id
+                - reason
+              properties:
+                chat_id:
+                  type: string
+                reason:
+                  type: string
+                  example: "spam"
+                message_text:
+                  type: string
+                  description: Текст сообщения или сниппет, на который жалоба
+      responses:
+        "200":
+          description: Жалоба принята
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+
+
+  /Admin/Get_Chats:
+    get:
+      tags:
+        - Admin
+      summary: Получение списка всех чатов для администратора
+      description: >
+        Возвращает список чатов с поддержкой фильтрации по сервису, 
+        наличию жалоб и текстовому поиску. 
+        Сортировка: сначала чаты с жалобами, затем по времени последнего сообщения.
+      parameters:
+        - in: query
+          name: service
+          schema:
+            type: string
+            enum: [ads, support, ""]
+            default: ""
+          description: "Фильтр по типу чата"
+        - in: query
+          name: has_complaint
+          schema:
+            type: string
+            enum: ["true", "false", ""]
+            default: ""
+          description: "Фильтр по наличию жалоб"
+        - in: query
+          name: search_text
+          schema:
+            type: string
+            default: ""
+          description: "Поиск по имени чата или метаданным (UID, ID лота)"
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: Список чатов для модерации
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chats:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        chat_id:
+                          type: string
+                        service:
+                          type: string
+                        chat_name:
+                          type: string
+                        active:
+                          type: boolean
+                        created_at:
+                          type: string
+                          format: date-time
+                        last_message_sent_at:
+                          type: string
+                          format: date-time
+                          nullable: true
+                        has_complaint:
+                          type: boolean
+                        complaint_count:
+                          type: integer
+                        complaint_reason:
+                          type: string
+                          nullable: true
+                        uid_buyer:
+                          type: string
+                          nullable: true
+                        uid_seller:
+                          type: string
+                          nullable: true
+                        metadata:
+                          type: string
+                          description: "JSON строка с полной метадатой"
+
+  /Delete_Message:
+    post:
+      tags:
+        - Admin
+      summary: Удалить сообщение (Soft Delete)
+      description: >
+        Помечает сообщение как удаленное. 
+        Требует передачи sender_id автора сообщения для прохождения проверки прав внутри БД.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - chat_id
+                - sender_id
+                - message_id
+              properties:
+                chat_id:
+                  type: string
+                sender_id:
+                  type: string
+                  description: "UID автора удаляемого сообщения"
+                message_id:
+                  type: integer
+      responses:
+        "200":
+          description: Сообщение успешно скрыто
+        "400":
+          description: Ошибка валидации или сообщение не найдено
+        "500":
+          description: Внутренняя ошибка сервера
+
+
+  /Add_User_Type:
+    post:
+      tags:
+        - System
+      summary: Добавить новый тип пользователя (роль)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role_name
+              properties:
+                role_name:
+                  type: string
+      responses:
+        "200":
+          description: Тип пользователя добавлен
+
+  /Get_Metadata:
+    get:
+      tags:
+        - System
+      summary: Получить сырые метаданные чата
+      parameters:
+        - in: path
+          name: chat_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Метаданные чата
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  metadata:
+                    type: object

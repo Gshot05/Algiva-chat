@@ -1,0 +1,150 @@
+[
+    {
+        "title": "Чаты: Получение метадаты",
+        "query": "SELECT metadata::TEXT FROM chats WHERE chat_id = $1;"
+    },
+    {
+        "title": "Чаты: Получить все чаты, сообщения с лимитом и фильтром по активности",
+        "query": "WITH profile_chats AS (\n    SELECT\n        c.chat_id,\n        c.service,\n        c.created_at,\n        c.chat_name,\n        c.active,\n        c.metadata,\n        cm.member_id,\n        cm.member_type_id\n    FROM chats c\n             JOIN chat_members cm ON cm.chat_id = c.chat_id\n    WHERE cm.member_id = $1\n      AND c.service = $2\n      AND (c.active = $3 OR $3 IS NULL)\n),\n-- Получаем последнее сообщение для каждого чата напрямую из messages\n     last_message_info AS (\n         SELECT DISTINCT ON (m.chat_id)\n             m.chat_id,\n             m.content,\n             m.sent_at\n         FROM profile_chats pc\n                  JOIN messages m ON m.chat_id = pc.chat_id\n         WHERE m.is_deleted = FALSE\n         ORDER BY m.chat_id, m.sent_at DESC\n     ),\n-- Применяем сортировку и LIMIT только к чатам с последними сообщениями\n     paginated_chats AS (\n         SELECT\n             pc.chat_id,\n             pc.service,\n             pc.created_at,\n             pc.chat_name,\n             pc.active,\n             pc.metadata,\n             pc.member_id,\n             pc.member_type_id,\n             COALESCE(lmi.content, '') AS last_message,\n             lmi.sent_at\n         FROM profile_chats pc\n                  LEFT JOIN last_message_info lmi ON lmi.chat_id = pc.chat_id\n         ORDER BY lmi.sent_at DESC NULLS LAST\n         LIMIT $4\n     ),\n-- Теперь считаем непрочитанные только для отфильтрованных чатов\n     unread_counts AS (\n         SELECT gpmb.chat_id, COUNT(gpmb.message_id) AS unread_count\n         FROM paginated_chats pgc\n                  LEFT JOIN get_paginated_messages_backward(pgc.chat_id, NULL, 10) gpmb ON gpmb.chat_id = pgc.chat_id\n         WHERE pgc.active = TRUE\n           AND gpmb.is_read = FALSE\n           AND gpmb.sender_id <> $1\n         GROUP BY gpmb.chat_id\n     )\nSELECT\n    pgc.chat_id,\n    pgc.service,\n    pgc.created_at,\n    pgc.chat_name,\n    pgc.active,\n    pgc.metadata::TEXT,\n    pgc.member_id,\n    pgc.member_type_id,\n    pgc.last_message,\n    COALESCE(uc.unread_count, 0) AS unread_count\nFROM paginated_chats pgc\n         LEFT JOIN unread_counts uc ON uc.chat_id = pgc.chat_id\nORDER BY pgc.sent_at DESC NULLS LAST;"
+    },
+    {
+        "title": "Чаты: Количество чатов по сервису",
+        "query": "SELECT\r\n    COUNT(*) as chats_count\r\nFROM chats c\r\nLEFT JOIN chat_members cm ON c.chat_id = cm.chat_id\r\nWHERE TRUE\r\n    AND cm.member_id = $1\r\n    AND c.service = $2;"
+    },
+    {
+        "title": "Чаты: добавить сообщение - OK",
+        "query": "-- chat_id, member, content, attachments\nSELECT * FROM add_message_return_id($1, $2, $3, $4);"
+    },
+    {
+        "title": "Чаты: следующая страница сообщений по чат id и последнему id сообщения",
+        "query": "select * from get_paginated_messages($1,$2) order by message_id; "
+    },
+    {
+        "title": "Чаты: предыдущая страница по чат id и id сообщения",
+        "query": "select * from get_paginated_messages_backward($1, $2); "
+    },
+    {
+        "title": "Чаты: создать чат",
+        "query": "-- chat_name, service, metadata(json)\nINSERT INTO public.chats\n(chat_name, service, created_at,active,metadata)\nVALUES($1,$2,now(),true,$3) returning chat_id;"
+    },
+    {
+        "title": "Чаты: добавить тип пользователя - OK",
+        "query": "INSERT INTO chat_member_types(name) VALUES($1) RETURNING member_type_id;"
+    },
+    {
+        "title": "Чаты: установить тип пользователя в чате - OK",
+        "query": "UPDATE chat_members\nSET member_type_id = $1\nWHERE member_id = $2 AND chat_id = $3 ;"
+    },
+    {
+        "title": "Чаты: отметить сообщение как удаленное - OK",
+        "query": "-- chat_id, sender_id, message_id\nCALL delete_message($1,$2,$3);"
+    },
+    {
+        "title": "Чаты: редактировать сообщение",
+        "query": "-- chat_id, sender_id, message_id, content\nCALL edit_message($1.$2,$3,$4);"
+    },
+    {
+        "title": "Чаты: прочитать сообщение",
+        "query": "-- chat_id, sender_id, message_id\nCALL watch_message($1,$2,$3);"
+    },
+    {
+        "title": "Чаты: чаты по сервису (backward)",
+        "query": "-- service\n-- current page first chat_id\nSELECT * FROM chats c\nWHERE c.chat_id < $2 AND c.service = $1\nlimit 50;"
+    },
+    {
+        "title": "Чаты: получить все чаты пользователя по сервису",
+        "query": "-- profile\n-- service\n-- limit (if '' -> all)\nSELECT c.* FROM chats c\nJOIN chat_members cm ON cm.chat_id = c.chat_id\nWHERE cm.member_id = $1 AND c.service = $2\nLIMIT NULLIF($3, '')::INTEGER;"
+    },
+    {
+        "title": "Чаты: Получить все сообщения по чату",
+        "query": "-- chat_id, last_loaded_message_id, limit \nSELECT * FROM get_paginated_messages_backward (\n$1,\nNULLIF($2, '')::INTEGER ,\nCASE WHEN '' = $3 THEN 100000 ELSE $3::INTEGER END\n) ORDER BY message_id ASC;"
+    },
+    {
+        "title": "Чаты: информация по чату + сообщения",
+        "query": "SELECT c.chat_id,\n c.service,\n c.created_at,\n c.chat_name,\n c.active,\n c.metadata::TEXT,\n (COALESCE(JSONB_AGG(JSONB_BUILD_OBJECT('member_id', cm.member_id, 'member_type_name', cmt.name)) FILTER (\nWHERE cm.member_id IS NOT NULL), '[]'::JSONB))::TEXT AS members,\n\n(SELECT COALESCE(JSONB_AGG(row_to_json(messages.*)), '[]'::JSONB)::TEXT\n FROM get_paginated_messages_backward_sort(c.chat_id, NULLIF($2,'')::INTEGER, CASE\nWHEN '' = $3 THEN 100000\nELSE $3::INTEGER\nEND) AS messages) AS messages\nFROM chats c\nLEFT JOIN chat_members cm ON c.chat_id = cm.chat_id\nLEFT JOIN chat_member_types cmt ON cm.member_type_id = cmt.member_type_id\nWHERE c.chat_id = $1\nGROUP BY c.chat_id,\n c.service,\n c.created_at,\n c.chat_name,\n c.active,\n c.metadata;"
+    },
+    {
+        "title": "Чаты: Получение флага о наличии новых тикетов - OK",
+        "query": "SELECT EXISTS(\nSELECT 1 FROM chats\nWHERE service = 'support' AND active = TRUE AND extract(epoch from created_at) >= $1\n);"
+    },
+    {
+        "title": "Чаты: Получение участника тикета",
+        "query": "SELECT\ncm.member_id\nFROM chats c\nLEFT JOIN chat_members cm ON cm.chat_id = c.chat_id\nWHERE c.service = 'support' AND c.chat_id = $1 AND cm.member_type_id = $2;\n"
+    },
+    {
+        "title": "Чаты: Получение количества тикетов по uid автора",
+        "query": "SELECT COUNT(c.chat_id)\nFROM chats c\nLEFT JOIN chat_members cm ON cm.chat_id = c.chat_id\nWHERE c.service = 'support' AND c.active = TRUE AND cm.member_id = $1 AND cm.member_type_id = 2;"
+    },
+    {
+        "title": "Чаты: Получение количества непрочитанных сообщений - OK",
+        "query": "-- $1 - тип пользователя member_type_id\n-- $2 - uid профиля пользователя\nWITH my_active_chats AS (\nSELECT c.chat_id\n FROM chats c\n RIGHT JOIN chat_members cm ON cm.chat_id = c.chat_id\n WHERE c.active = TRUE\n AND cm.member_id = $2 \n),\nunread_counts AS (\nSELECT gpmb.chat_id, COUNT(gpmb.message_id) AS unread_count\nFROM my_active_chats mac\nLEFT JOIN get_paginated_messages_backward(mac.chat_id, NULL, 10) gpmb ON gpmb.chat_id = mac.chat_id\nLEFT JOIN chat_members cm ON cm.chat_id = mac.chat_id AND cm.member_id = gpmb.sender_id\nWHERE gpmb.is_read = FALSE AND cm.member_type_id <> $1 AND gpmb.sender_id <> $2\nGROUP BY gpmb.chat_id\n )\nSELECT mac.chat_id,\n COALESCE(uc.unread_count, 0) AS unread_count\nFROM my_active_chats mac\nLEFT JOIN unread_counts uc ON mac.chat_id = uc.chat_id;\n\n"
+    },
+    {
+        "title": "Чаты: проверка на существование тикета",
+        "query": "--chat_id\nSELECT EXISTS(SELECT 1 FROM public.chats WHERE chat_id = $1);"
+    },
+    {
+        "title": "Чаты: получить статус обращения",
+        "query": "--chat_id\nSELECT metadata->>'status_uid' AS status_uid\nFROM public.chats\nWHERE chat_id = $1;"
+    },
+    {
+        "title": "Чаты: Получение новых обращений",
+        "query": "SELECT * FROM get_paginated_messages(p_chat_id := $1, p_last_loaded_message_id := $2);"
+    },
+    {
+        "title": "Чаты: Получение новых сообщений - OK",
+        "query": "SELECT * FROM get_paginated_messages(p_chat_id := $1, p_last_loaded_message_id := $2)\nORDER BY message_id;"
+    },
+    {
+        "title": "Чаты: получение чатов по фильтрам - OK",
+        "query": "-- EXPLAIN ANALYZE\nWITH filtered_chats AS (\n    SELECT\n        c.chat_id,\n        c.chat_name,\n        c.active,\n        c.created_at,\n        c.metadata ->> 'description' AS description,\n    c.metadata ->> 'problem' AS service_meta,\n    c.metadata ->> 'status_uid' AS status_meta,\n    c.metadata ->> 'tag_uid' AS tag_uid,\n    c.metadata ->> 'reassigned' AS reassigned,\n    c.service,\n    cm_auth.member_id AS author,\n    cm_exec.member_id AS executor,\n    coalesce(c.metadata->>'prev_executor', '') AS prev_executor\nFROM chats c\n    LEFT JOIN chat_members cm_auth ON c.chat_id = cm_auth.chat_id AND cm_auth.member_type_id = 2\n    LEFT JOIN chat_members cm_exec ON c.chat_id = cm_exec.chat_id AND cm_exec.member_type_id = 1\nWHERE TRUE\n  AND ($1 = '' OR c.metadata ->> 'problem' = ANY(STRING_TO_ARRAY($1, ',')))\n  AND ($2 = '' OR c.metadata ->> 'tag_uid' = ANY(STRING_TO_ARRAY($2, ',')))\n  AND (\n    $3 = '' OR\n    ($3 = 'true' AND c.active = TRUE) OR\n    ($3 = 'false' AND c.active = FALSE)\n    )\n  AND ($4 = '' OR c.metadata ->> 'status_uid' = ANY(STRING_TO_ARRAY($4, ',')))\n  AND (\n    $5 = '' OR\n    LOWER(c.metadata ->> 'description') LIKE LOWER('%' || $5 || '%') OR\n    LOWER(c.chat_name) LIKE LOWER('%' || $5 || '%')\n    )\n  AND (\n    $6 = '' OR cm_auth.member_id = ANY(STRING_TO_ARRAY($6, ','))\n    )\n  AND (\n    $7 = '' OR cm_exec.member_id = ANY(STRING_TO_ARRAY($7, ','))\n    )\n  AND (\n    NULLIF($8, '') IS NULL OR c.created_at >= TO_TIMESTAMP(NULLIF($8, '')::bigint)\n    )\n  AND (\n    NULLIF($9, '') IS NULL OR c.created_at <= TO_TIMESTAMP(NULLIF($9, '')::bigint)\n    )\n\nGROUP BY\n    c.chat_id, c.chat_name, c.active, c.created_at, c.metadata, c.service,\n    cm_auth.member_id, cm_exec.member_id\nORDER BY c.chat_id DESC\n    LIMIT 20\nOFFSET (($10 - 1) * 20)\n    ),\n    unread_counts AS (\nSELECT\n    fc.chat_id,\n    COUNT(m.message_id) AS unread_count\nFROM filtered_chats fc\n    INNER JOIN messages m ON m.chat_id = fc.chat_id\n    INNER JOIN chat_members cm ON cm.chat_id = m.chat_id AND cm.member_id = m.sender_id\nWHERE m.is_read = FALSE\n  AND fc.active = TRUE\n  AND cm.member_type_id <> 1\n  AND m.sender_id <> $11\nGROUP BY fc.chat_id\n    )\nSELECT\n    fc.chat_id,\n    fc.chat_name,\n    fc.service_meta AS service,\n    fc.description,\n    fc.status_meta AS status,\n    fc.reassigned,\n    fc.tag_uid AS tag,\n    fc.author,\n    fc.executor,\n    fc.prev_executor,\n    fc.created_at AS creation_date,\n    COALESCE(uc.unread_count, 0) AS unread_count\nFROM filtered_chats fc\n         LEFT JOIN unread_counts uc ON uc.chat_id = fc.chat_id;\n"
+    },
+    {
+        "title": "Чаты: Добавить участника в чат",
+        "query": "INSERT INTO chat_members (chat_id, member_id, member_type_id)\nVALUES ($1, $2, $3)\nON CONFLICT (member_id, chat_id) DO NOTHING;"
+    },
+    {
+        "title": "Чаты: получить участников",
+        "query": "SELECT * FROM chat_members cm\nLEFT JOIN chat_member_types cmt ON cm.member_type_id = cmt.member_type_id\nWHERE cm.chat_id = $1;"
+    },
+    {
+        "title": "Чаты: задать значение полю в metadata",
+        "query": "-- chat_id, field_name, field_value\n-- Черная магия\nUPDATE chats\nSET metadata = JSONB_SET(metadata, ARRAY[$2]::text[], TO_JSONB($3::TEXT))\nWHERE chat_id = $1;"
+    },
+    {
+        "title": "Чаты: Сменить member_id с deviceId на uid профиля студента",
+        "query": "UPDATE chat_members SET member_id = $1\nWHERE member_id = $2;"
+    },
+    {
+        "title": "Чаты: Сменить sender_id с deviceId на uid профиля студента",
+        "query": "UPDATE messages SET sender_id = $1\nWHERE sender_id = $2;"
+    },
+    {
+        "title": "Чаты: Получить все чаты, сообщения, количество непрочитанных",
+        "query": "-- sender_id, service\nWITH profile_chats AS (\nSELECT c.chat_id\nFROM chats c\nJOIN chat_members cm ON cm.chat_id = c.chat_id\nWHERE cm.member_id = $1 AND c.service = $2\n)\nSELECT\nc.chat_id,\nc.service,\nc.created_at,\nc.chat_name,\nc.active,\nc.metadata::TEXT,\n(COALESCE(JSONB_AGG(JSONB_BUILD_OBJECT(\n'member_id', cm.member_id,\n'member_type_name', cmt.name\n)) FILTER (WHERE cm.member_id IS NOT NULL), '[]'::JSONB))::TEXT AS members,\n(SELECT\n COALESCE(JSONB_AGG(row_to_json(messages.*)), '[]'::JSONB)::TEXT\n FROM\n get_paginated_messages_backward(\n c.chat_id,\n NULL,\n 10\n ) AS messages\n) AS messages\nFROM chats c\nLEFT JOIN chat_members cm ON c.chat_id = cm.chat_id\nLEFT JOIN chat_member_types cmt ON cm.member_type_id = cmt.member_type_id\nWHERE\nc.chat_id IN (SELECT chat_id FROM profile_chats)\nGROUP BY\nc.chat_id,\nc.service,\nc.created_at,\nc.chat_name,\nc.active,\nc.metadata\nORDER BY c.chat_id;"
+    },
+    {
+        "title": "Перевести обращение в работу",
+        "query": "SELECT assign_ticket_executor($1, $2, $3);\n"
+    },
+    {
+        "title": "Чаты: Получение информации об обращении",
+        "query": "SELECT\nc.chat_id AS chat_id,\nc.chat_name AS chat_name,\nc.active AS active,\nc.created_at AS datecreate,\nc.metadata->>'tag_uid' AS tag,\nc.metadata->>'status_uid' AS status,\nc.metadata->>'problem' AS service,\nc.metadata->>'description' AS description,\nc.metadata->>'path' AS path,\ncoalesce(c.metadata->>'reassigned', 'false') AS reassigned,\ncoalesce(c.metadata->>'prev_executor', '') AS prev_executor,\nc.metadata::TEXT AS metadata,\nJSONB_AGG(JSONB_BUILD_OBJECT('member_id', cm.member_id, 'member_type_id', cm.member_type_id))::text AS members\nFROM chats c\nLEFT JOIN chat_members cm ON cm.chat_id = c.chat_id\nWHERE c.chat_id = $1\nGROUP BY c.chat_id"
+    },
+    {
+        "title": "Чаты: изменение статуса обращения - OK",
+        "query": "--chat_id, active, status_uid\nUPDATE public.chats\nSET \nmetadata = jsonb_set(metadata, '{status_uid}', to_jsonb($3::text)),\nactive = $2\nWHERE chat_id = $1;"
+    },
+    {
+        "title": "Чаты: Изменение статуса с возможностью занулить исполнителя",
+        "query": "-- $1 - IN p_chat_id bigint\r\n-- $2 - IN p_active boolean\r\n-- $3 - IN p_status_uid text\r\n-- $4 - IN p_reset_executor boolean\r\nCALL change_status_reset_executor($1, $2, $3, $4);"
+    },
+    {
+        "title": "Чаты: запись жалобы в метадату",
+        "query": "UPDATE chats SET metadata = metadata || jsonb_build_object( 'has_complaint', true, 'complaint_count', COALESCE((metadata->>'complaint_count')::int, 0) + 1, 'last_complaint_at', now()::text, 'last_complaint_reason', $3, 'complaint_message', $4 ) WHERE chat_id = $1;"
+    },
+    {
+        "title": "Админ: Получение списка чатов с фильтрами",
+        "query": "WITH filtered_chats AS (\n    SELECT\n        c.chat_id,\n        c.service,\n        c.chat_name,\n        c.active,\n        c.created_at,\n        c.metadata,\n        COALESCE((c.metadata->>'has_complaint')::boolean, false) as has_complaint,\n        COALESCE((c.metadata->>'complaint_count')::int, 0) as complaint_count,\n        c.metadata->>'last_complaint_reason' as complaint_reason,\n        c.metadata->>'uid_buyer' as uid_buyer,\n        c.metadata->>'uid_seller' as uid_seller\n    FROM chats c\n    WHERE TRUE\n      AND ($1 = '' OR c.service = $1)\n      AND ($2 = '' OR (c.metadata->>'has_complaint')::boolean = ($2)::boolean)\n      AND ($3 = '' OR LOWER(c.chat_name) LIKE LOWER('%' || $3 || '%') OR LOWER(c.metadata::text) LIKE LOWER('%' || $3 || '%'))\n),\nlast_msg AS (\n    SELECT DISTINCT ON (m.chat_id)\n        m.chat_id,\n        m.sent_at\n    FROM messages m\n    JOIN filtered_chats fc ON m.chat_id = fc.chat_id\n    WHERE m.is_deleted = FALSE\n    ORDER BY m.chat_id, m.sent_at DESC\n),\npaginated AS (\n    SELECT\n        fc.*,\n        lm.sent_at as last_message_sent_at\n    FROM filtered_chats fc\n    LEFT JOIN last_msg lm ON lm.chat_id = fc.chat_id\n    ORDER BY \n        fc.has_complaint DESC,\n        lm.sent_at DESC NULLS LAST,\n        fc.created_at DESC\n    LIMIT $4\n    OFFSET $5\n)\nSELECT\n    p.chat_id,\n    p.service,\n    p.chat_name,\n    p.active,\n    p.created_at,\n    p.last_message_sent_at,\n    p.has_complaint,\n    p.complaint_count,\n    p.complaint_reason,\n    p.uid_buyer,\n    p.uid_seller,\n    p.metadata::TEXT as raw_metadata\nFROM paginated p;"
+    }
+]
