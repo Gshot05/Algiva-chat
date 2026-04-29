@@ -1,6 +1,6 @@
 <mxfile host="app.diagrams.net">
   <diagram name="Страница-1" id="6vhmA59K8Xdd6y5LlQgf">
-    <mxGraphModel dx="3142" dy="2896" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1131" dy="1791" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -89,6 +89,14 @@
         </mxCell>
         <mxCell id="UqqT4urgchzkFPyOfZkk-24" parent="1" style="whiteSpace=wrap;html=1;" value="Ручка&amp;nbsp;Get_Messages&lt;div&gt;Проверка что пользак входит в чат&lt;/div&gt;" vertex="1">
           <mxGeometry height="70" width="140" x="1171" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="lyxbEA7Sxgz5cY9VKSYc-2" edge="1" parent="1" source="UqqT4urgchzkFPyOfZkk-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="lyxbEA7Sxgz5cY9VKSYc-1" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lyxbEA7Sxgz5cY9VKSYc-3" connectable="0" parent="lyxbEA7Sxgz5cY9VKSYc-2" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="Передаём&amp;nbsp;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;chat_id&lt;/div&gt;&lt;div&gt;last_seen_message_id&lt;/div&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry relative="1" x="-0.1743" y="-1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="UqqT4urgchzkFPyOfZkk-27" parent="1" style="whiteSpace=wrap;html=1;" value="Возвращает все сообщения по чату" vertex="1">
           <mxGeometry height="60" width="120" x="1180" y="425" as="geometry" />
@@ -187,6 +195,15 @@
         </mxCell>
         <mxCell id="8ld3VfINqq2AH8Kl_O48-7" parent="1" style="whiteSpace=wrap;html=1;" value="Возвращает все сообщения по чату" vertex="1">
           <mxGeometry height="60" width="120" x="2650" y="420" as="geometry" />
+        </mxCell>
+        <mxCell id="lyxbEA7Sxgz5cY9VKSYc-5" edge="1" parent="1" source="lyxbEA7Sxgz5cY9VKSYc-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="lyxbEA7Sxgz5cY9VKSYc-4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="lyxbEA7Sxgz5cY9VKSYc-1" parent="1" style="whiteSpace=wrap;html=1;" value="Вызывается ручка&lt;br&gt;Mark_As_Read&lt;br&gt;&amp;nbsp;для прочетения&lt;br&gt;сообщений" vertex="1">
+          <mxGeometry height="95" width="180" x="1151" y="610" as="geometry" />
+        </mxCell>
+        <mxCell id="lyxbEA7Sxgz5cY9VKSYc-4" parent="1" style="whiteSpace=wrap;html=1;" value="Все сообщения от последнего прочитаны(200)" vertex="1">
+          <mxGeometry height="60" width="120" x="1181" y="802.5" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

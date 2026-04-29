@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS messages
     edit TIMESTAMPTZ NULL,
     CONSTRAINT pk_messages  PRIMARY KEY (shard_key, message_id)
 );
+ALTER TABLE messages ADD CONSTRAINT uq_chat_message UNIQUE (chat_id, message_id);
 
 CREATE TABLE IF NOT EXISTS chat_message_counters (
     chat_id BIGINT PRIMARY KEY,
@@ -426,3 +427,43 @@ VALUES (_chat_id, _member_id, 1);
 END;
 $function$
 ;
+
+-- Таблица для хранения прочтения сообщений
+CREATE TABLE IF NOT EXISTS read_messages (
+    chat_id BIGINT NOT NULL,
+    message_id BIGINT NOT NULL,
+    reader_id VARCHAR(45) NOT NULL, -- UID пользователя
+    read_at TIMESTAMPTZ DEFAULT now() NOT NULL,
+    CONSTRAINT pk_read_messages PRIMARY KEY (chat_id, message_id, reader_id),
+    CONSTRAINT fk_read_message FOREIGN KEY (chat_id, message_id) 
+        REFERENCES messages (chat_id, message_id) ON DELETE CASCADE
+);
+
+
+CREATE OR REPLACE PROCEDURE mark_messages_as_read(
+    IN p_chat_id BIGINT,
+    IN p_reader_id VARCHAR,
+    IN p_last_seen_message_id BIGINT -- ID последнего сообщения, которое видит пользователь
+)
+LANGUAGE plpgsql
+AS
+$$
+BEGIN
+    INSERT INTO read_messages (chat_id, message_id, reader_id, read_at)
+    SELECT 
+        m.chat_id, 
+        m.message_id, 
+        p_reader_id, 
+        NOW()
+    FROM messages m
+    WHERE m.chat_id = p_chat_id
+      AND m.message_id <= p_last_seen_message_id
+      AND m.sender_id <> p_reader_id -- Не помечаем свои сообщения как прочитанные самим собой
+      AND NOT EXISTS (
+          SELECT 1 FROM read_messages rm 
+          WHERE rm.chat_id = m.chat_id 
+            AND rm.message_id = m.message_id 
+            AND rm.reader_id = p_reader_id
+      );
+END;
+$$;
