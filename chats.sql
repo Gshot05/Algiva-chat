@@ -93,7 +93,7 @@ DECLARE
     v_bucket_id INTEGER;
     v_bucket_size CONSTANT INTEGER := 10000;
     computed_shard_key BIGINT;
-    in_strict INTEGER;
+    in_strict VARCHAR;
 BEGIN
     v_bucket_id := FLOOR((p_message_id - 1) / v_bucket_size) + 1;
     -- Вычисление shard_key
