@@ -27,11 +27,11 @@ Select * from chats
 
 -- Добавляем продавца (тип 1)
 INSERT INTO chat_members (chat_id, member_id, member_type_id)
-VALUES (101, 'user_seller_001', 1);
+VALUES (1, 'user_seller_001', 1);
 
 -- Добавляем покупателя (тип 2)
 INSERT INTO chat_members (chat_id, member_id, member_type_id)
-VALUES (101, 'user_buyer_001', 2);
+VALUES (1, 'user_buyer_001', 2);
 
 select * from chat_members
 
